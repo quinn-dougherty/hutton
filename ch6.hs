@@ -124,10 +124,10 @@ axs :: [Int] -- dummy data
 axs = [1,65,3,7,45,2,6,65,8,3,4,5,0,9,1,7,3,6,5,8,0,4,3]
 
 merge :: Ord a => ([a],[a]) -> [a]
-merge ([]    , ys    )          = ys
-merge (xs    , []    )          = xs
-merge ((x:xs), (y:ys)) | x <= y = x : y : merge (xs, ys)
-                       | y < x  = y : x : merge (xs, ys)
+merge ([], ys)          = ys
+merge (xs, [])          = xs
+merge (xs, ys) | head xs <= head ys = (head xs) : merge (tail xs, ys)
+               | head ys <  head xs = (head ys) : merge (xs, tail ys)
 
 halve :: [a] -> ([a],[a])
 halve [] = ([],[])
