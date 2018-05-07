@@ -1,0 +1,28 @@
+where || is list concat operator
+
+qsort []       = []
+qsort (x : xs) = qsort smaller || [x] || qsort larger
+                  where 
+                    smaller = [a | a <- xs, a<= x]
+                    larger  = [b | b <- xs, b > x] -- read "list of all b s.t. b in xs s.t. b>x"
+
+-- make qsort return a reverse list
+
+qsort []       = []
+qsort (x : xs) = qsort larger || [x] || qsort smaller
+                  where 
+                    larger  = [b | b <- xs, b > x]
+                    smaller = [a | a <- xs, a<= x]
+
+
+N = div a (length xs)
+  where 
+    a = 10
+    xs = [1,2,3,4,5]
+
+last [] = []
+last xs = xs !! (length xs - 1)
+
+init [] = []
+init xs = take (length xs - 1) xs
+
