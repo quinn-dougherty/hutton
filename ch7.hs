@@ -124,17 +124,55 @@ composeUniformlyTypedFunctions = foldr (.) id
 -- 7.6 Base Conversion
 type Bit = Int
 
-bin2Intbckwrds :: [Bit] -> Int
-bin2Intbckwrds bits = sum [w * b | (w,b) <- zip weights bits]
+make8      :: [Bit] -> [Bit]
+make8 bits = take 8 (bits ++ repeat 0)
+chop8      :: [Bit] -> [[Bit]]
+chop8 []   = []
+chop8 bits = take 8 bits : chop8 (drop 8 bits)
+
+bin2IntBckwrds :: [Bit] -> Int
+bin2IntBckwrds bits = sum [w * b | (w,b) <- zip weights bits]
   where weights = iterate (*2) 1
 
 -- iterate f x = [x, f x, f.f x, f.f.f x, ... ]
-bin2int'bckwrds :: [Bit] -> Int
-bin2int'bckwrds = foldr (\x y -> x + 2*y) 0
+bin2int'Bckwrds :: [Bit] -> Int
+bin2int'Bckwrds = foldr (\x y -> x + 2*y) 0
 {-
 bin2Int :: [Bit] -> Int
 bin2Int =
 -}
 
-int2Binbckwrds :: Int -> Bit
-int2Binbckwrds = foldr (\x y -> x + rem 2 y) 0
+int2BinBckwrds :: Int -> [Bit]
+int2BinBckwrds 0 = []
+int2BinBckwrds n = mod n 2 : int2BinBckwrds (div n 2)
+
+encode :: String -> [Bit]
+encode = concat . map (make8 . int2BinBckwrds . ord)
+
+decode :: [Bit] -> String
+decode = map (chr . bin2int'Bckwrds) . chop8
+
+transmit :: String -> String
+transmit = decode . channel . encode
+channel :: [Bit] -> [Bit]
+channel = id
+
+--7.8.1
+-- express [f x | x <- xs, p x], for some f and p, in map & filter
+
+-- mf f p xs = [f x | x <- xs, p x]
+-- -- where
+-- -- f :: a -> b
+-- -- p :: a -> Bool
+-- -- xs :: [a]
+
+mf :: (a->b) -> (a->Bool) -> [a] -> [b]
+mf f p xs = [f x | x <- xs, p x]
+mf' :: (a->b) -> (a->Bool) -> [a] -> [b]
+mf' f p xs = map f . filter p [xs]
+--7.8.2 -- done lines 34-58 of this file.
+
+-- 7.8.3
+map''' :: (a -> b) -> [a] -> [b]
+map''' f xs = [f x | x <- xs]
+
