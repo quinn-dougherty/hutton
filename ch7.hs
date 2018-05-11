@@ -168,11 +168,98 @@ channel = id
 
 mf :: (a->b) -> (a->Bool) -> [a] -> [b]
 mf f p xs = [f x | x <- xs, p x]
+--mf' :: (a->b) -> (a->Bool) -> [a] -> [b]
+--mf' f p xs = map f . filter p xs
+
 mf' :: (a->b) -> (a->Bool) -> [a] -> [b]
-mf' f p xs = map f . filter p [xs]
+mf' f p xs = map f (filter p xs)
+
+{- 
+fm :: (b->Bool) -> (a->b) -> [a] -> [b]
+fm p f xs = [p y | y <- ys]
+  where
+   ys = [f x | x <- xs] -- I can't figure out why this isn't working
+-}
+
+fm' :: (b->Bool) -> (a->b) -> [a] -> [b]
+fm' p f xs = filter p (map f xs)
+
 --7.8.2 -- done lines 34-58 of this file.
 
 -- 7.8.3
 map''' :: (a -> b) -> [a] -> [b]
 map''' f xs = [f x | x <- xs]
+--mapf :: [a] -> [b]
+--mapf xs = 
+
+--7.8.4
+xOPy :: Num a => (a->a->a) -> (a,a) -> a
+xOPy op (x,y) = op x y
+dec2Int' :: [Int] -> Int
+dec2Int' xs = sum [xOPy (*) w | w <- zip n xs]
+  where
+    n = [10 ^ (p-k) | k <- [0..]]
+    p = (-1) + length xs
+
+-- map (xOPy (*)) (zip [1,2,3,4,5] [1, 10, 100, 1000, 10000]) == [1,20,300,4000,50000]
+
+{-
+dec2Int :: [Int] -> Int
+dec2Int =  foldl (+) (map (xOPy (*)) (zip _ [10 ^ (p-k) | k <- [0..]]))
+--  where
+--    n = [10 ^ (p-k) | k <- [0..]]
+--    p = (-1) + length xs
+-}
+
+--7.8.5
+-- the expression sumsqreven = compose [sum, map (^2), filter even] is invalid because, assuming its the same compose we defined earlier which i called "compose uniformly typed functions", compose is just a fold-wrapping around (.), and we'd have to be more careful than that... interestinly, when I called ":t composeUniformlyTypedFunctions [sum, map (^2), filter even]" I got an exciting error message, "Occurs check: cannot construct the infinite type: b ~ [b]". It's interacting w "sum" as [[b]] for Num b, instead of [b].
+-- removing sum we can run :t and get ""composeUniformlyTypedFunctions [map (^2), filter even] :: Integral b => [b] -> [b]""
+sqrsOfEvens :: Integral b => [b] -> [b]
+sqrsOfEvens = composeUniformlyTypedFunctions [map (^2), filter even] -- is perfectly valid. 
+
+-- 7.8.6
+{-
+curry' :: ((a,b) -> c) -> a -> b -> c
+curry' = \x -> 
+
+uncurry' :: (a->b->c)-> (a,b) -> c
+uncurry' f =
+-}
+-- from wiki.haskell.org:
+  {- 
+
+    Simplify curry id
+    Simplify uncurry const
+    Express snd
+    using curry
+    or uncurry
+    and other basic Prelude functions and without lambdas
+    Write the function \(x,y) -> (y,x)
+    without lambda and with only Prelude functions 
+-}
+
+
+
+  
+div11 :: Int -> Int
+div11 k = div k 11
+
+
+-- 7.8.7
+unfold :: (a -> Bool) -> (a -> a) -> (a -> a) -> a -> [a]
+unfold p h t x | p x       = []
+               | otherwise = h x : unfold p h t (t x)
+
+-- do chop8, map f, iterate f w unfold. 
+{-
+make8      :: [Bit] -> [Bit]
+make8 bits = take 8 (bits ++ repeat 0)
+chop8      :: [Bit] -> [[Bit]]
+chop8 []   = []
+chop8 bits = take 8 bits : chop8 (drop 8 bits)
+-}
+
+chop8' :: [Bit] -> [[Bit]]
+chop8' = unfold
+
 
