@@ -44,7 +44,6 @@ any' p (x:xs) | p x       = True
 dummy1 = [2,4,6,7,8,9]
 dummy2 = [1..10]
 
-
 takeWhile' :: (a -> Bool) -> [a] -> [a]
 takeWhile' p [] = []
 takeWhile' p (x:xs) | p x       = x : takeWhile' p xs
@@ -68,7 +67,7 @@ length' [] = 0
 length' (_:xs) = 1 + length' xs
 
 length'' :: [a] -> Int
-length'' = foldr (\_ n -> 1 + n) 0
+length'' = foldr' (\_ n -> 1 + n) 0
 
 -- reverse revisited
 snoc :: a -> [a] -> [a]
@@ -189,8 +188,9 @@ fm' p f xs = filter p (map f xs)
 -- 7.8.3
 map''' :: (a -> b) -> [a] -> [b]
 map''' f xs = [f x | x <- xs]
---mapf :: [a] -> [b]
---mapf xs = 
+mapf :: Num a => [a] -> [a]
+mapf xs = [f x | x <- xs]
+  where f = (*2) -- hrm... not too satisfying, 
 
 --7.8.4
 xOPy :: Num a => (a->a->a) -> (a,a) -> a
@@ -216,6 +216,9 @@ dec2Int =  foldl (+) (map (xOPy (*)) (zip _ [10 ^ (p-k) | k <- [0..]]))
 -- removing sum we can run :t and get ""composeUniformlyTypedFunctions [map (^2), filter even] :: Integral b => [b] -> [b]""
 sqrsOfEvens :: Integral b => [b] -> [b]
 sqrsOfEvens = composeUniformlyTypedFunctions [map (^2), filter even] -- is perfectly valid. 
+
+false2 :: a -> Bool
+false2 x = False
 
 -- 7.8.6
 {-
@@ -259,7 +262,8 @@ chop8 []   = []
 chop8 bits = take 8 bits : chop8 (drop 8 bits)
 -}
 
+{-
 chop8' :: [Bit] -> [[Bit]]
 chop8' = unfold
-
+-}
 
