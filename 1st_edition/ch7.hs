@@ -253,7 +253,7 @@ div11 :: Int -> Int
 div11 k = div k 11
 
 snd' :: (a,b) -> b
-snd' p = curry p
+snd' p = curry (id p)
 
 
 -- 7.8.7

@@ -40,3 +40,4 @@ twice :: (a->a) -> a -> a
 twice f x = f (f x)
 
 --3.11.5
+{- equality of two total functions means if y=fx and y=fx' then x=x', or if y=fx and y'=fx tehn y=y'. this isn't "feasible" usually because of infinity, but some total functions have a finite list of input/output pairs-- for these, equality of functions would be fine. 
