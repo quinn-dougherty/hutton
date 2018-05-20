@@ -217,16 +217,14 @@ dec2Int =  foldl (+) (map (xOPy (*)) (zip _ [10 ^ (p-k) | k <- [0..]]))
 sqrsOfEvens :: Integral b => [b] -> [b]
 sqrsOfEvens = composeUniformlyTypedFunctions [map (^2), filter even] -- is perfectly valid. 
 
-false2 :: a -> Bool
-false2 x = False
 
 -- 7.8.6
 {-
-curry' :: ((a,b) -> c) -> a -> b -> c
-curry' = \x -> 
+curry2 :: ((a,b)->c) -> (a->b->c)-- I would have thought this was the type signature, but :t curry returns the RHS w no parenthesis. 
+curry2 = \x -> 
 
-uncurry' :: (a->b->c)-> (a,b) -> c
-uncurry' f =
+uncurry2 :: (a->b->c) -> ((a,b) -> c)
+uncurry2 f = 
 -}
 -- from wiki.haskell.org:
   {- 

@@ -1,3 +1,31 @@
+import System.IO
+
+--derived primitives
+{-
+getLine' :: IO String
+getLine' = do x <- getChar
+             if x == '\n' then
+                return []
+             else
+               do xs <- getLine'
+                  return (x:xs)
+-} 
+putStr' :: String -> IO ()
+putStr' [] = return ()
+putStr' (x:xs) = do putChar x
+                    putStr' xs
+
+putStrLn' :: String -> IO ()
+putStrLn' xs = do putStr' xs
+                  putChar '\n'
+
+strLen :: IO ()
+strLen = do putStr' "Enter a string: "
+            xs <- getLine
+            putStr' "The string has "
+            putStr' (show (length xs))
+            putStrLn " characters"
+
 -- IO utils
 beep :: IO ()
 beep = putStr "\BEL"
@@ -15,11 +43,17 @@ seqn :: [IO a] -> IO ()
 seqn [] = return ()
 seqn (a:as) = do a
                  seqn as
+{-
+seqn' [] = return []
+seqn' (act:acts) = do x <- act
+                      xs <- seqn' acts
+                      return (x:xs)
+-}
 
 wait :: Int -> IO()
 wait n = seqn [return () | _ <- [1..n]]
 
-putStr' xs = seqn [putChar x | x <- xs]
+putStr'' xs = seqn [putChar x | x <- xs]
 
 -- Game of life, pg 112
 type Pos = (Int, Int)
