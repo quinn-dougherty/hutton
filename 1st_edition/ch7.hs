@@ -230,6 +230,7 @@ uncurry2 f =
   {- 
 
     Simplify curry id
+     
     Simplify uncurry const
     Express snd
     using curry
@@ -239,11 +240,20 @@ uncurry2 f =
     without lambda and with only Prelude functions 
 -}
 
+id' :: a->a
+id' x = x
+--curryId :: 
 
 
-  
+{- -- const is the set of constant functions
+uncurryConst :: a -> c
+uncurryConst b = 
+-}
 div11 :: Int -> Int
 div11 k = div k 11
+
+snd' :: (a,b) -> b
+snd' p = curry p
 
 
 -- 7.8.7
