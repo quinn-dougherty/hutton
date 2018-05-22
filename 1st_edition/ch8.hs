@@ -120,5 +120,14 @@ factor = do symbol "("
             symbol ")"
             return e
            +++ natural
+
+eval :: String -> Int
+eval xs = case parse expr xs of
+             [(n,[])] -> n
+             [(_,out)] -> error
+             [] -> error "invalid input"
+
+-- just notes, not gonna do exercises cuz i can't find the deprecated library. 
+
 -} 
 
