@@ -1,3 +1,6 @@
+import Data.Char
+import Data.List
+
 -- this i need to learn better cuz i never finished the exercises in 1st edition.
 
 curriedAdd :: Int -> Int -> Int
@@ -62,4 +65,60 @@ f v (x:xs) = f (v # x) xs
 
 -- for functions like sum, and, etal that can be understood either as foldl or foldr, the choice is made strictly for efficiency reasons.
 
+
+odd' :: Integral a => a -> Bool
+odd' = not . even
+
+
+-- simulating transmission of chars as bin digits.
+type Bit = Int
+
+bin2int :: [Bit] -> Int
+bin2int bits = sum [w*b | (w,b) <- zip weights bits]
+  where weights = iterate (*2) 1
+
+bin2int' :: [Bit] -> Int
+bin2int' = foldr (\x y -> x + 2*y) 0
+
+int2bin :: Int -> [Bit]
+int2bin 0 = []
+int2bin n = mod n 2 : int2bin (div n 2)
+
+make8 :: [Bit] -> [Bit]
+make8 bits = take 8 (bits ++ repeat 0)
+
+-- (make8 . int2bin) 13 == [1,0,1,1,0,0,0,0]
+
+encode :: String -> [Bit]
+encode = concat . map (make8 . int2bin . ord)
+
+chop8 :: [Bit] -> [[Bit]]
+chop8 [] = []
+chop8 bits = take 8 bits : chop8 (drop 8 bits)
+
+decode :: [Bit] -> String
+decode = map (chr . bin2int) . chop8
+
+transmit :: String -> String
+transmit = decode . channel . encode
+
+channel :: [Bit] -> [Bit]
+channel = id
+
+-- First past the post vote counting
+votes :: [String]
+votes = ["Red", "Blue", "Green", "Blue", "Blue", "Red"]
+
+count :: Eq a => a -> [a] -> Int
+count x = length . filter (== x)
+
+rmDups :: Eq a => [a] -> [a]
+rmDups []     = []
+rmDups (x:xs) = x : (filter (/= x) (rmDups xs))
+
+result :: Ord a => [a] -> [(Int,a)]
+result vs = sort [(count v vs, v) | v <- rmDups vs]
+
+winner :: Ord a => [a] -> a
+winner = snd . last . result
 
