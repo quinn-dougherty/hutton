@@ -97,6 +97,7 @@ folde f g =
 
 --8.9.8
 
-
+  -- see ch08.hs, we're going to edit/expand the book walkthru i already typed up. 
+-- ****OK. So now, extend isTaut to support disjunction and equivalence. 
 
 -- 8.9.9

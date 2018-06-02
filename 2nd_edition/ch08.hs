@@ -73,7 +73,7 @@ add'' :: Nat -> Nat -> Nat
 add'' m n = int2nat (nat2int m + nat2int n)
 add :: Nat -> Nat -> Nat
 add Zero n = n
-add (Succ m) n = Succ (add' m n)
+add (Succ m) n = Succ (add m n)
 
 data List' a = Nil' | Cons' a (List' a)
 len :: List' a -> Int
@@ -135,6 +135,8 @@ data Prop = Const Bool
   | Not Prop
   | And Prop Prop
   | Imply Prop Prop
+  | Or Prop Prop
+  | Equiv Prop Prop
   deriving Show
 
 -- lets give us some trash data,
@@ -146,7 +148,8 @@ p3 :: Prop -- "A implies A and B"
 p3 = Imply (Var 'A') (And (Var 'A') (Var 'B'))
 p4 :: Prop -- "A and A implies B implies B" (modus ponens)
 p4 = Imply (And (Var 'A') (Imply (Var 'A') (Var 'B'))) (Var 'B')
-
+p5 :: Prop -- "A or B iff B or A"
+p5 = Equiv (Or (Var 'A') (Var 'B')) (Or (Var 'B') (Var 'A'))
 -- these are not operations that can evaluate yet.
 -- which is why we have to define //substitution// as a //lookup table//
 
@@ -158,6 +161,8 @@ eval s (Var x)     = find x s
 eval s (Not p)     = not (eval s p)
 eval s (And p q)   = eval s p && eval s q
 eval s (Imply p q) = eval s p <= eval s q
+eval s (Or p q)    = eval s p || eval s q
+eval s (Equiv p q) = (eval s p <= eval s q) && (eval s q <= eval s p)
 
 vars :: Prop -> [Char]
 vars (Const _)   = []
@@ -165,6 +170,8 @@ vars (Var x)     = [x]
 vars (Not p)     = vars p
 vars (And p q)   = vars p ++ vars q
 vars (Imply p q) = vars p ++ vars q
+vars (Or p q)    = vars p ++ vars q
+vars (Equiv p q) = vars p ++ vars q
 
 -- 7.9.6
 -- utils from ch7
@@ -209,6 +216,9 @@ False
 *Main> isTaut p4
 True
 -}
+
+
+-- and it looks like exercise 8.9.8 is mission accomplished
 
 
 -- 8.7 abstract machine
