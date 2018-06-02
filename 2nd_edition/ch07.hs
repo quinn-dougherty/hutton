@@ -145,7 +145,7 @@ winner' bs = case rank (rmEmpty bs) of
                (c:cs) -> winner' (elim c bs)
 -- copying some over from when i did these in 1st edition
 
---7.8.1
+--7.9.1
 -- express [f x | x <- xs, p x], for some f and p, in map & filter
 
 -- mf f p xs = [f x | x <- xs, p x]
@@ -172,7 +172,7 @@ fm p f xs = [p y | y <- ys]
 fm' :: (b->Bool) -> (a->b) -> [a] -> [b]
 fm' p f xs = filter p (map f xs)
 
---7.8.2
+--7.9.2
 all' :: (a -> Bool) -> [a] -> Bool
 all' p []           = True
 all' p (x:xs) | p x = and (True : all' p xs : [])
@@ -197,7 +197,7 @@ dropWhile' p (x:xs) | p x       = dropWhile' p xs
                     | otherwise = x:xs -- 
 
 
--- 7.8.3 -- 
+-- 7.9.3 -- 
 map''' :: (a -> b) -> [a] -> [b]
 map''' f xs = [f x | x <- xs]
 mapf :: Num a => [a] -> [a]
@@ -207,7 +207,7 @@ mapf xs = [f x | x <- xs]
 mapf' :: (a->b) -> ([a]->[b])
 mapf' = \f -> map f -- i think this is what they meant. 
 
---7.8.4 -- way not done. 
+--7.9.4 -- way not done. 
 xOPy :: Num a => (a->a->a) -> (a,a) -> a
 xOPy op (x,y) = op x y
 dec2Int' :: [Int] -> Int
@@ -226,49 +226,63 @@ dec2Int =  foldl (+) (map (xOPy (*)) (zip _ [10 ^ (p-k) | k <- [0..]]))
 --    p = (-1) + length xs
 -}
 
--- 7.8.5
-{-
-curry2 :: ((a,b)->c) -> (a->b->c)-- I would have thought this was the type signature, but :t curry returns the RHS w no parenthesis. 
-curry2 = \x -> 
+-- currying is in its own file, 7.9.5.hs
 
-uncurry2 :: (a->b->c) -> ((a,b) -> c)
-uncurry2 f = 
--}
--- from wiki.haskell.org:
-  {- 
-
-    Simplify curry id
-     
-    Simplify uncurry const
-    Express snd
-    using curry
-    or uncurry
-    and other basic Prelude functions and without lambdas
-    Write the function \(x,y) -> (y,x)
-    without lambda and with only Prelude functions 
--}
-
-id' :: a->a
-id' x = x
---curryId :: 
-
-
-{- -- const is the set of constant functions
-uncurryConst :: a -> c
-uncurryConst b = 
--}
-div11 :: Int -> Int
-div11 k = div k 11
-
---snd' :: (a,b) -> b
---snd' p = curry (id p)
-
-
--- 7.8.6
+-- 7.9.6
 unfold :: (a -> Bool) -> (a -> a) -> (a -> a) -> a -> [a]
 unfold p h t x | p x       = []
                | otherwise = h x : unfold p h t (t x)
+{- --- copy for reference
+int2bin :: Int -> [Bit]
+int2bin 0 = []
+int2bin n = mod n 2 : int2bin (div n 2)
+-}
+int2bin' :: Int -> [Bit]
+int2bin' = unfold (== 0) (\x -> mod x 2) (\x -> div x 2)
+{- --- copy for reference
+chop8 :: [Bit] -> [[Bit]]
+chop8 [] = []
+chop8 bits = take 8 bits : chop8 (drop 8 bits)
+-}
+isEmpty :: Eq a => [a] -> Bool
+isEmpty l | l==[]     = True
+          | otherwise = False
+chop8' :: [Bit] -> [[Bit]] 
+chop8' = unfold isEmpty (\bs -> take 8 bs) (\bs -> drop 8 bs)
 -- redefine chop8, mapf, iteratef using unfold. 
+-- -- annoyed because i'm still not sure i understand what they mean by mapf and iteratef in a satisfying way. 
+
+-- 7.9.7 
+
+parity :: [Bit] -> [Bit]
+parity bs |  (odd . count 1) b8s = 1 : b8s
+          | (even . count 1) b8s = 0 : b8s
+            where
+              b8s = make8 bs
+
+{-
+encode' :: String -> [Bit]
+encode' = concat . map (make8 . int2bin . ord)
+
+chop8' :: [Bit] -> [[Bit]]
+chop8' [] = []
+chop8' bits = take 8 bits : chop8 (drop 8 bits)
+
+decode' :: [Bit] -> String
+decode' = map (chr . bin2int) . chop8
+
+transmit' :: String -> String
+transmit' = decode . channel . encode
+
+channel' :: [Bit] -> [Bit]
+channel' = id
+-}
+
+transmit' :: String -> String
+transmit' = decode . channel . encode
+-- a new transmit, which finds errors. 
+
+-- 7.9.8 test the new transmit
 
 --7.9.9 -- altMap
 altMap :: (a->b) -> (a->b) -> [a] -> [b]
