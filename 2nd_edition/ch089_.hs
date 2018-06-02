@@ -70,3 +70,33 @@ height (NodeBin t1 t2) = 1 + (max (height t1) (height t2)) -- i think this is co
 --trash data to test this
 t :: BinTree Int
 t = NodeBin (NodeBin (NodeBin (LeafBin 1) (LeafBin 0)) (LeafBin 2)) (NodeBin (LeafBin 1) (LeafBin 3)) -- this got a numLeaves 5, currently height 4, and not balanced. and balanced True (its the odd case, the last True case before otherwise). 
+
+-- 8.9.4
+balance :: [a] -> BinTree a
+balance [x] = LeafBin x
+balance xs  = NodeBin (balance (take n xs)) (balance (drop n xs))
+  where n = div (length xs) 2
+
+--8.9.5
+data Expr = Val Int | Add Expr Expr deriving Show
+folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+{- s.t. folde f g replaces each Val constructor in an expr by the function f and each add constructor by the function g -}
+folde f g = 
+
+
+--8.9.6
+
+
+
+
+--8.9.7
+
+
+
+
+
+--8.9.8
+
+
+
+-- 8.9.9
