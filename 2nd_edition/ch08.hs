@@ -222,24 +222,32 @@ True
 
 
 -- 8.7 abstract machine
-data Expr = Val Int | Add Expr Expr
+data Expr = Val Int | Add Expr Expr | Mult Expr Expr
 value :: Expr -> Int
-value (Val n) = n
-value (Add x y) = value x + value y -- this evaluates left right. 
+value (Val n)    = n
+value (Add x y)  = value x + value y
+value (Mult x y) = value x * value y -- this evaluates left right. 
 
 -- control stacks, for order of operations
 type Cont = [Op]
-data Op = EVAL Expr | ADD Int
+data Op = EVAL1 Expr | ADD Int | EVAL2 Expr | MULT Int
 -- the all caps version is just what it looks like inside a List
 
+-- making it EVAL1 and EVAL2 is pretty good for adding Multiplication, but i don't think its the most correct or the prettiest. 
+
 eval' :: Expr -> Cont -> Int
-eval' (Val n)   c = exec c n
-eval' (Add x y) c = eval' x (EVAL y : c)
+eval' (Val n)    c = exec c n
+eval' (Add x y)  c = eval' x (EVAL1 y : c)
+eval' (Mult x y) c = eval' x (EVAL2 y : c)
 
 exec :: Cont -> Int -> Int
-exec []           n = n
-exec (EVAL y : c) n = eval' y (ADD n : c)
-exec (ADD n : c)  m = exec c (n+m)
+exec []            n = n
+exec (EVAL1 y : c) n = eval' y (ADD n : c)
+exec (ADD n : c)   m = exec c (n+m)
+exec (EVAL2 y : c) n = eval' y (MULT n : c)
+exec (MULT n : c)  m = exec c (n*m)
 
 value' :: Expr -> Int
 value' e = eval' e []
+
+-- exercise 8.9.9 extend the abstract machine to support multiplication. 
