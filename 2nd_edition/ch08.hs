@@ -54,7 +54,7 @@ safehead xs = Just (head xs)
 
 -- 8.3 Newtype declarations
 {- "using newtype rather than data brings an efficiency benefit, because newtype constructors do not incur any cost when programs are evaluated- they are removed by the compiler once typechecking is completed." -} 
-newtype Nat' = N Int -- so N is the constructor,
+newtype Nat'' = N Int -- so N is the constructor,
 -- *Main> :t N
 -- Int -> Nat'
 
@@ -69,11 +69,11 @@ int2nat :: Int -> Nat
 int2nat 0 = Zero
 int2nat n = Succ (int2nat (n-1))
 
+add'' :: Nat -> Nat -> Nat
+add'' m n = int2nat (nat2int m + nat2int n)
 add :: Nat -> Nat -> Nat
-add m n = int2nat (nat2int m + nat2int n)
-add' :: Nat -> Nat -> Nat
-add' Zero n = n
-add' (Succ m) n = Succ (add' m n)
+add Zero n = n
+add (Succ m) n = Succ (add' m n)
 
 data List' a = Nil' | Cons' a (List' a)
 len :: List' a -> Int
@@ -211,4 +211,25 @@ True
 -}
 
 
--- 8.7 abstract machine 
+-- 8.7 abstract machine
+data Expr = Val Int | Add Expr Expr
+value :: Expr -> Int
+value (Val n) = n
+value (Add x y) = value x + value y -- this evaluates left right. 
+
+-- control stacks, for order of operations
+type Cont = [Op]
+data Op = EVAL Expr | ADD Int
+-- the all caps version is just what it looks like inside a List
+
+eval' :: Expr -> Cont -> Int
+eval' (Val n)   c = exec c n
+eval' (Add x y) c = eval' x (EVAL y : c)
+
+exec :: Cont -> Int -> Int
+exec []           n = n
+exec (EVAL y : c) n = eval' y (ADD n : c)
+exec (ADD n : c)  m = exec c (n+m)
+
+value' :: Expr -> Int
+value' e = eval' e []
