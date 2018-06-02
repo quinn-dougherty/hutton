@@ -37,8 +37,17 @@ occurs' x (Node l y r) | x==y      = True
 -- redo this w compare :: Ord a => a->a->Ordering and explain why its better.
 
 occurs :: Ord a => a -> SearchTree a -> Bool
-occurs x (Leaf y)     = True
-occurs x (Node l y r) = False
+occurs x (Leaf y)     = x==y
+occurs x (Node l y r) | compare x y == LT = occurs x l
+                      | compare x y == EQ = True
+                      | compare x y == GT = occurs x r
+-- this should be right. 
+
+-- same trash data from file ch08.hs
+s :: SearchTree Int
+s = Node (Node (Leaf 1) 3 (Leaf 4)) 5 (Node (Leaf 6) 7 (Leaf 9))
+-- its working the only reason it would be better would be if the typechecker trashed some info after it verified correctness..? 
+
 
 --8.9.3
 data BinTree a = LeafBin a | NodeBin (BinTree a) (BinTree a) deriving Show
@@ -51,8 +60,8 @@ balanced :: BinTree a -> Bool
 balanced (LeafBin x)                                    = True -- singleton or empty trees are balanced
 balanced (NodeBin t1 t2) | numLeaves t1     == numLeaves t2 = True
                          | 1 + numLeaves t1 == numLeaves t2 = True
-                         | numLeaves t1 == 1 + numLeaves t2 = True
-                         | otherwise                        = False -- i know, doesn't account for "off by one" for odd numbers, yet... 
+                         | numLeaves t1 - 1 == numLeaves t2 = True
+                         | otherwise                        = False -- 
 
 height :: BinTree a -> Int
 height (LeafBin x) = 1
@@ -60,4 +69,4 @@ height (NodeBin t1 t2) = 1 + (max (height t1) (height t2)) -- i think this is co
 
 --trash data to test this
 t :: BinTree Int
-t = NodeBin (NodeBin (NodeBin (LeafBin 1) (LeafBin 0)) (LeafBin 2)) (NodeBin (LeafBin 1) (LeafBin 3)) -- this got a numLeaves 5, currently height 4, and not balanced. and balanced True (its the odd case, the last True case before otherwise. 
+t = NodeBin (NodeBin (NodeBin (LeafBin 1) (LeafBin 0)) (LeafBin 2)) (NodeBin (LeafBin 1) (LeafBin 3)) -- this got a numLeaves 5, currently height 4, and not balanced. and balanced True (its the odd case, the last True case before otherwise). 
