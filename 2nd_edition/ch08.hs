@@ -222,7 +222,7 @@ True
 
 
 -- 8.7 abstract machine
-data Expr = Val Int | Add Expr Expr | Mult Expr Expr
+data Expr = Val Int | Add Expr Expr | Mult Expr Expr deriving Show
 value :: Expr -> Int
 value (Val n)    = n
 value (Add x y)  = value x + value y
@@ -230,7 +230,7 @@ value (Mult x y) = value x * value y -- this evaluates left right.
 
 -- control stacks, for order of operations
 type Cont = [Op]
-data Op = EVAL1 Expr | ADD Int | EVAL2 Expr | MULT Int
+data Op = EVAL1 Expr | ADD Int | EVAL2 Expr | MULT Int deriving Show
 -- the all caps version is just what it looks like inside a List
 
 -- making it EVAL1 and EVAL2 is pretty good for adding Multiplication, but i don't think its the most correct or the prettiest. 
@@ -251,3 +251,19 @@ value' :: Expr -> Int
 value' e = eval' e []
 
 -- exercise 8.9.9 extend the abstract machine to support multiplication. 
+
+folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+folde f g (Val n)               = f n
+folde f g (Add e r) = g (folde f g e) (folde f g r)
+folde f g (Mult e r) = g (folde f g e) (folde f g r)
+
+{-
+data Maybe = Just a | Nothing
+-- -- alex demonstrating functor 
+fmap :: (a -> b) -> Maybe a -> Maybe b
+fmap f (Just a) = Just (f a)
+fmap f Nothing = Nothing
+-} 
+--dummy data
+ex :: Expr
+ex = Add (Mult (Val 3) (Val 4)) (Val 7)
