@@ -81,10 +81,11 @@ balance xs  = NodeBin (balance (take n xs)) (balance (drop n xs))
 
 
 --copying the abstract machine from 8.7, after having added Mult.
--- we'll just leave Mult at Mult and change Add to g, change Val to f... 
+-- we'll just leave Mult at Mult and change Add to g, change Val to f...
+type Fn = a -> a -> a
 data Expr =
     Val Int
-  | Add Expr Expr
+  | Fn Expr Expr Fn
   | Mult Expr Expr
   | UnOp Int
   | BinOp Expr Expr
@@ -120,8 +121,8 @@ value' :: Expr -> Int
 value' e = eval' e []
 -- that's the extent of copying.
 -- now lets start back from Cont.
-type BINOP = Int -> Int -> Int
-type UNOP  = Int -> Int
+type BINOP = a -> a -> a
+type UNOP  = Int -> a
 data OpFld = EVAL Expr | BINOP Int | UNOP Int
 type ContFld = [OpFld]
 
@@ -141,8 +142,22 @@ folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
 folde f g = 
 convoluted and problematic my dude-} 
 
---8.9.6
+{- YO
+look in ch08.hs. folde was MUCH simpler than we thought here, but worth keeping my attempted extension into it...
+-}
 
+--8.9.6
+folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+folde f g (Val n)               = f n
+folde f g (Add e r) = g (folde f g e) (folde f g r)
+folde f g (Mult e r) = g (folde f g e) (folde f g r)
+
+-- use folde define a function eval ::
+
+eval'' :: Expr -> Int
+eval'' = folde id (+)
+
+--size :: Expr -> Int
 
 
 

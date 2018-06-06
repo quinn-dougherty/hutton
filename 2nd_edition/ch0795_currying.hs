@@ -36,3 +36,8 @@ div11 k = div k 11
 --snd' :: (a,b) -> b
 --snd' p = curry (id p)
 
+curry' :: ((a,b)->c) -> a -> b -> c
+curry' op x y = op (x,y)
+
+uncurry' :: (a->b->c) -> (a,b) -> c
+uncurry' op t = op (fst t) (snd t)

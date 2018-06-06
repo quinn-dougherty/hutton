@@ -252,10 +252,21 @@ value' e = eval' e []
 
 -- exercise 8.9.9 extend the abstract machine to support multiplication. 
 
+-- 8.9.5
 folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
 folde f g (Val n)               = f n
 folde f g (Add e r) = g (folde f g e) (folde f g r)
 folde f g (Mult e r) = g (folde f g e) (folde f g r)
+
+-- 8.9.6
+
+-- use folde define a function eval ::
+
+eval'' :: Expr -> Int
+eval'' = folde id (+)
+
+size :: Expr -> Int
+size = folde 1 (:) -- size isn't done yet.
 
 {-
 data Maybe = Just a | Nothing
