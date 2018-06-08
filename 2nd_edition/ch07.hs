@@ -260,9 +260,21 @@ parity bs |  (odd . count 1) b8s = 1 : b8s
             where
               b8s = make8 bs
 
+parityTest1 :: Bool
+parityTest1 = (parity [1,0,1,1,0,0,0,0]) == [1,1,0,1,1,0,0,0,0]
+
+parityTest2 :: Bool
+parityTest2 = (parity [1,1,1,1,0,0,0,0]) == [0,1,1,1,1,0,0,0,0]
+
+main :: IO ()
+main = do {
+  putStrLn ((show (parityTest1 == parityTest2)) ++ "--- tests passed if true")
+}
+
+
 {-
-encode' :: String -> [Bit]
-encode' = concat . map (make8 . int2bin . ord)
+encode :: String -> [Bit]
+encode = concat . map (make8 . int2bin . ord)
 
 chop8' :: [Bit] -> [[Bit]]
 chop8' [] = []
@@ -278,9 +290,23 @@ channel' :: [Bit] -> [Bit]
 channel' = id
 -}
 
+getParity :: [Bit] -> Bit
+getParity bs = head (parity bs)
+
+-- parityCheck
+encode' :: String -> (Bit,[Bit])
+encode' s = (getParity bs, bs)
+  where
+    bs = encode s
+channel' :: (Bit,[Bit]) -> [Bit]
+channel' pbs | fst pbs == getParity (snd pbs) = snd pbs
+             | otherwise    = error "transmissionError"
+-- for some reason this is never returning error.
+
+
 transmit' :: String -> String
-transmit' = decode . channel . encode
--- a new transmit, which finds errors. 
+transmit' = decode . channel' . encode'
+-- a new transmit, which finds errors. -- not done yet
 
 -- 7.9.8 test the new transmit
 

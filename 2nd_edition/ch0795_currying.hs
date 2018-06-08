@@ -41,3 +41,4 @@ curry' op x y = op (x,y)
 
 uncurry' :: (a->b->c) -> (a,b) -> c
 uncurry' op t = op (fst t) (snd t)
+

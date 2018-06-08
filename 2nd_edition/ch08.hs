@@ -254,8 +254,8 @@ value' e = eval' e []
 
 -- 8.9.5
 folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
-folde f g (Val n)               = f n
-folde f g (Add e r) = g (folde f g e) (folde f g r)
+folde f g (Val n)    = f n
+folde f g (Add e r)  = g (folde f g e) (folde f g r)
 folde f g (Mult e r) = g (folde f g e) (folde f g r)
 
 -- 8.9.6
@@ -263,10 +263,10 @@ folde f g (Mult e r) = g (folde f g e) (folde f g r)
 -- use folde define a function eval ::
 
 eval'' :: Expr -> Int
-eval'' = folde id (+)
+eval'' = folde id (+) -- not consistent w multiplication version
 
 size :: Expr -> Int
-size = folde 1 (:) -- size isn't done yet.
+size = folde (const 1) (+) -- size isn't done yet.
 
 {-
 data Maybe = Just a | Nothing
@@ -277,4 +277,4 @@ fmap f Nothing = Nothing
 -} 
 --dummy data
 ex :: Expr
-ex = Add (Mult (Val 3) (Val 4)) (Val 7)
+ex = Add (Mult (Val 3) (Val 4)) (Add (Val 2) (Val 3))
