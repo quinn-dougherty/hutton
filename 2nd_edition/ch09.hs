@@ -122,7 +122,6 @@ solutions'' :: [Int] -> Int -> [Expr]
 solutions'' ns n =
   [e | ns' <- choices ns, (e,m) <- results ns', m == n]
 
-
 main :: IO () -- i can't abstract this out into another file like it says in the book
 main = print (solutions'' [1,3,7,10,25,50] 765)
 -- solutions' is supposed to be optimized pretty well
@@ -139,3 +138,33 @@ choices' xs = concat [perms ys | ys <- (subs xs)]
 -- 9.11.2 -- isChoice :: Eq a => [a] -> [a] -> Bool
 -- which decides if one list is chosen from another
 --- w/o using perms and subs.
+
+-- remove first occurrence from list.
+rmElem :: Eq a => a -> [a] -> [a]
+rmElem x' [] = []
+rmElem x' (x:xs) | x==x'     = xs
+                 | otherwise = x : rmElem x' xs
+
+isChoice :: Eq a => [a] -> [a] -> Bool
+isChoice xs ys | elem xs (choices ys) = True
+               | otherwise            = False
+-- now w/o using choices
+
+{-
+subs :: [a] -> [[a]]
+subs [] = [[]]
+subs (x:xs) = yss ++ map (x:) yss -- 2^n in input length. x
+              where yss = subs xs
+
+interleave :: a -> [a] -> [[a]]
+interleave x []     = [[x]] -- n+1 in input length 
+interleave x (y:ys) = (x:y:ys) : map (y:) (interleave x ys)
+
+perms :: [a] -> [[a]]
+perms []     = [[]] -- factorial in input length
+perms (x:xs) = concat (map (interleave x) (perms xs))
+-} 
+isChoice' :: Eq a => [a] -> [a] -> Bool
+isChoice' [] _      = True
+isChoice' _ []      = True
+isChoice' (x:xs) ys = and [isChoice' 
