@@ -163,8 +163,9 @@ interleave x (y:ys) = (x:y:ys) : map (y:) (interleave x ys)
 perms :: [a] -> [[a]]
 perms []     = [[]] -- factorial in input length
 perms (x:xs) = concat (map (interleave x) (perms xs))
--} 
+-}   
 isChoice' :: Eq a => [a] -> [a] -> Bool
 isChoice' [] _      = True
-isChoice' _ []      = True
-isChoice' (x:xs) ys = and [isChoice' 
+isChoice' _ []      = False
+isChoice' xs ys = and [elem x ys | x <- xs]
+-- looks like that's right. 
