@@ -32,6 +32,9 @@ values (Val n)     = [n]
 values (App _ l r) = values l ++ values r
 
 eval :: Expr -> [Int]
+-- the point of [Int] as return type is strictly so that
+-- success denoted by singleton list
+-- failure denoted by empty list
 eval (Val n) = [n | n > 0]
 eval (App o l r) = [apply o x y | x <- eval l,
                                   y <- eval r,
@@ -42,7 +45,9 @@ ex :: Expr
 ex = App Add (Val 1) (App Mul (Val 2) (Val 3))
 
 ex' :: Expr
-ex' = App Mul (App Add (Val 1) (Val 50)) (App Sub (Val 25) (Val 10))
+-- the commutatiity consideration forces x<=y for x*y, so we have to switch out 51 and 15
+ex' = App Mul (App Sub (Val 25) (Val 10)) (App Add (Val 1) (Val 50))
+-- ca't figure out why or how eval ex' returns []
 
 subs :: [a] -> [[a]]
 subs [] = [[]]
@@ -105,7 +110,7 @@ type Result = (Expr,Int) -- now to optimize
 results :: [Int] -> [Result]
 results []  = []
 results [n] = [(Val n,n) | n > 0]
-results ns = [res | (ls,rs) <- split ns,
+results ns = [res | (ls,rs) <- split ns, -- make sure this is split and not split' 
                     lx      <- results ls,
                     ry      <- results rs,
                     res     <- combine' lx ry]
@@ -121,11 +126,11 @@ solutions' ns n =
 solutions'' :: [Int] -> Int -> [Expr]
 solutions'' ns n =
   [e | ns' <- choices ns, (e,m) <- results ns', m == n]
-
+{-
 main :: IO () -- i can't abstract this out into another file like it says in the book
 main = print (solutions'' [1,3,7,10,25,50] 765)
 -- solutions' is supposed to be optimized pretty well
-
+-} 
 -- further optimzation by going up to valid and altering it for commutativity 
 
 --- EXERCISES ---
@@ -169,3 +174,42 @@ isChoice' [] _      = True
 isChoice' _ []      = False
 isChoice' xs ys = and [elem x ys | x <- xs]
 -- looks like that's right. 
+
+-- 9.11.3
+-- if split also returned pairs containing the empty list, solutions would
+split' :: [a] -> [([a],[a])]
+split' xs = [(take n xs, drop n xs) | n <- [0..(length xs)]]
+-- when split' is used, the thing runs forever / crashes!
+-- probably because one of the helper functions didn't control for []
+
+--9.11.4
+--for
+nmbs :: [Int]
+nmbs = [1,3,7,10,25,50]
+--verify that
+numPossExprs :: Int
+numPossExprs = 33665406
+numVldExprs :: Int
+numVldExprs = 4672540
+--using choices, exprs, eval
+{-
+*Main> (length . choices) [1..6]
+1957
+*Main> (length . exprs) [1..6]
+43008
+-}
+
+{-
+eval :: Expr -> [Int]
+eval (Val n) = [n | n > 0]
+eval (App o l r) = [apply o x y | x <- eval l,
+                                  y <- eval r,
+                                  valid o x y]
+-}
+
+test1 :: Bool
+test1 = numVldExprs == (length . choices) [1..2] -- hrm why is this false
+test2 :: Bool
+test2 = False
+
+-- use choices . eval
