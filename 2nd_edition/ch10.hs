@@ -118,7 +118,7 @@ play board player =
 
 nim :: IO ()
 nim = play initial 1
-
 -- shell in emacs doesn't do IO monad correctly. terminal does outside in debian.
 
-
+cls :: IO ()
+cls = putStr "\ESC[2J"

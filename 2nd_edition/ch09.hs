@@ -195,21 +195,41 @@ numVldExprs = 4672540
 {-
 *Main> (length . choices) [1..6]
 1957
+--- whcih also equals "length (map exprs (choices nmbs))"
 *Main> (length . exprs) [1..6]
 43008
 -}
 
-{-
-eval :: Expr -> [Int]
-eval (Val n) = [n | n > 0]
-eval (App o l r) = [apply o x y | x <- eval l,
-                                  y <- eval r,
-                                  valid o x y]
--}
-
 test1 :: Bool
-test1 = numVldExprs == (length . choices) [1..2] -- hrm why is this false
-test2 :: Bool
-test2 = False
+test1 = numPossExprs == (length . concat) (map exprs (choices nmbs)) -- True
+rmEm :: [[a]] -> [[a]]
+rmEm [[]]     = []
+rmEm ([]:xss) = rmEm xss
+rmEm (xs:xss) = xs : rmEm xss
+-- actually this function is stupid because concat doest that automatically
 
--- use choices . eval
+test2 :: Bool
+test2 = numVldExprs ==  (length . concat . map eval . concat . map exprs . choices) nmbs
+-- takes forever but false
+
+-- 9.11.5
+numIntVldExprs :: Int
+numIntVldExprs = 10839369
+test3 :: Bool -- should be the exact same calls as test2 except w eval' 
+test3 = numIntVldExprs == (length . concat . map eval' . concat . map exprs . choices) nmbs
+-- a divide by zero exception? 
+
+valid' :: Op -> Int -> Int -> Bool
+valid' Add x y = x <= y
+valid' Sub x y = True -- modded so that negative is valid. 
+valid' Mul x y = x /= 1 && y /= 1 && x <= y
+valid' Div x y = y /= 1 && x `mod` y ==0 && y /= 0 -- getting divie by zero exception somehow. 
+
+eval' :: Expr -> [Int]
+-- the point of [Int] as return type is strictly so that
+-- success denoted by singleton list
+-- failure denoted by empty list
+eval' (Val n) = [n | n > 0]
+eval' (App o l r) = [apply o x y | x <- eval' l,
+                                  y <- eval' r,
+                                  valid' o x y]
