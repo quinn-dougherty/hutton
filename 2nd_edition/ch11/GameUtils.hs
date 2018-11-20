@@ -1,5 +1,13 @@
+module GameUtils where
+
 type Grid = [[Player]]
 data Player = O | B | X deriving (Eq, Ord, Show)
+
+data Tree a = Node a [Tree a]
+  deriving Show
+
+depth :: Int
+depth = 9
 
 cls :: IO ()
 cls = putStr "\ESC[2J"

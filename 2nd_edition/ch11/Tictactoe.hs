@@ -1,14 +1,17 @@
 -- Chapter 11
 -- unbeatable tic tac toe.
 
+module Tictactoe where
+
 import Data.Char
 import Data.List
 import System.IO
 import GameUtils
+-- import GameTrees
 
 -- tic tac toe
 size :: Int
-size = 3
+size = 2
 
 next :: Player -> Player
 next O = X
@@ -74,27 +77,3 @@ getNat prompt = do putStr prompt
                    else
                      do putStrLn "ERROR: Invalid number"
                         getNat prompt
-
---MAIN
-run :: Grid -> Player -> IO ()
-run g p = do cls
-             goto (1,1)
-             putGrid g
-             run' g p
-
-run' :: Grid -> Player -> IO ()
-run' g p | wins O g = putStrLn "Player O wins!\n"
-         | wins X g = putStrLn "Player X wins!\n"
-         | full g = putStrLn "It's a draw!\n"
-         | otherwise =
-             do i <- getNat (prompt p)
-                case move g i p of
-                  [] -> do putStrLn "ERROR: Invalid move"
-                           run' g p
-                  [g'] -> run g' (next p)
-
-prompt :: Player -> String
-prompt p = "Player " ++ show p ++ ", enter your move: "
-
-tictactoe :: IO ()
-tictactoe = run empty O
