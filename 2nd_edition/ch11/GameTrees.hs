@@ -2,6 +2,7 @@ module GameTrees where
 
 import Tictactoe
 import GameUtils
+import System.Random -- not gonna work w/o reinstalling GHC apparently 
 
 gametree :: Grid -> Player -> Tree Grid
 gametree g p = Node g [gametree g' (next p) | g' <- moves g p]
@@ -35,4 +36,12 @@ bestmove g p = head [g' | Node (g',p') _ <- ts, p' == best]
                  tree = prune depth (gametree g p)
                  Node (_,best) ts = minimax tree
 
+bestmove' :: Grid -> Player -> Grid
+bestmove' g p = (!!) k mvs 
+               where
+                 mvs = [g' | Node (g',p') _ <- ts, p' == best]
+                 tree = prune depth (gametree g p)
+                 Node (_,best) ts = minimax tree
+                 n = length mvs
+                 k = randomRIO(0,n)  
 
