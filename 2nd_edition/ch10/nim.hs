@@ -32,6 +32,16 @@ putBoard [a,b,c,d,e] = do putRow 1 a
                           putRow 4 d
                           putRow 5 e
 
+-- exercise 10.10.2
+putBoard' :: Board -> IO ()
+putBoard' [] = return ()
+putBoard' (x:xs) = do putRow (length xs) x
+                      putBoard' xs
+
+-- exercise 10.10.3
+putBoard'' :: Board -> IO ()
+putBoard'' xs = sequence_ [putRow k x | (k,x) <- zip [1..] xs]
+
 newline :: IO ()
 newline = putChar '\n'
 
