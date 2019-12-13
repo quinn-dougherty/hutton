@@ -25,3 +25,34 @@ instance Applicative ST where
 instance Monad ST where
   -- (>>=) :: ST a -> (a -> ST b) -> ST b
   st >>= f = S (\s -> let (x, s') = app st s in app (f x) s')
+
+
+
+
+
+-- exercise 8 --- do Functor, Applicative, and Monad in do notation
+newtype ST' a = S' (State -> (a, State))
+
+app' :: ST' a -> State -> (a, State)
+app' (S' st) x = st x
+
+instance Functor ST' where
+  -- fmap :: (a -> b) -> ST' a -> ST' b
+  fmap g (S' st) = S' (\s ->
+                         do (x, s') <- app' st s
+                            return (g x, s')
+
+instance Applicative ST' where
+  -- pure :: a -> ST' a
+  pure x = S' (\s -> (x, s))
+
+  -- (<*>) :: ST' (a -> b) -> ST' a -> ST' b
+  stf <*> stx = S' (\s ->
+                      do (x, s') <- app' stf' s
+                         (x s'') <- app' stx s'
+                         return (f x, s'')
+
+instance Monad ST' where
+  -- (>>=) :: ST' a -> (a -> ST' b) -> ST' b
+  st >>= f = S' (\s ->
+                   let (x, s') = app' st s in app' (f x) s')

@@ -22,6 +22,7 @@ instance Applicative ((->) a) where
 instance Monad ((->) a) where
   -- (>>=) :: m b -> (b -> m c) -> m c
   -- (>>=) :: (a -> b) -> (b -> (a -> c)) -> (a -> c)
+  f >>= g = g . f
 
 -}
 -- exercise 4
@@ -44,8 +45,21 @@ data Expr a = Var a | Val Int | Add (Expr a) (Expr a) deriving Show
 
 instance Functor Expr where
   -- fmap :: (a -> b) -> Expr a -> Expr b
-  fmap f (Var a) = Var (f a)
-  fmap _ (Val x) = Val x
+  fmap f (Var x) = Var (f x)
+  fmap _ (Val i) = Val i
   fmap f (Add e1 e2) = Add (fmap f e1) (fmap f e2)
+
+instance Applicative Expr where
+  -- pure :: a -> Expr a
+  pure x = Var x
+
+  -- (<*>) :: Expr (a -> b) -> Expr a -> Expr b
+  _ <*> (Val i) = Val i
+  (Var f) <*> (Var x) = Var (f x)
+  (Var f) <*> (Add e1 e2) =
+
+instance Monad Expr where
+  -- (>>=) :: Expr a -> (a -> Expr b) -> Expr b
+  e >>= me = ...
 
 -- exercise 8 in MyState.hs
