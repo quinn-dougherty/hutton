@@ -5,19 +5,15 @@ import Data.Char
 import Control.Applicative
 
 comment :: Parser ()
-comment = do x <- item
-             y <- item
-             if x=='-' && y=='-' then
-               do z' <- many (sat (\str -> isSpace str || isAlphaNum str))
-                  z <- item
-                  if z=='\n' then
-                    return ()
-                  else
-
-                    return ()
-             else
-               return ()
+comment = do sat (== '-')
+             sat (== '-')
+             many (sat (\c -> isSpace c || isAlphaNum c))
+             return ()
 
 testComment :: String
-testComment = "-- comment \n"
+testComment = "-- this is a comment \n"
 
+-- exercise 5
+data Expr = Val Int | Add Expr Expr | Mult Expr Expr | Subt Expr Expr
+
+-- exercise 6 in Parse.hs

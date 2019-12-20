@@ -107,6 +107,14 @@ int = do char '-'
          return (-n)
       <|> nat
 
+-- type MyNum = Either Int Rational
+--frac :: Parser MyNum
+--frac = do numer <- int
+ --         char '/'
+--          denom <- int
+--          return (numer/denom)
+--       <|> int
+
 -- handling spacing
 token :: Parser a -> Parser a
 token p = do space
@@ -123,6 +131,9 @@ natural = token nat
 integer :: Parser Int
 integer = token int
 
+-- fractional :: Parser MyNum
+-- fractional = token frac
+
 symbol :: String -> Parser String
 symbol xs = token (string xs)
 
@@ -134,29 +145,46 @@ nats = do symbol "["
           symbol "]"
           return (n:ns)
 
+
+--
 expr :: Parser Int
 expr = do t <- term
           (do symbol "+"
               e <- expr
               return (t + e))
+           <|> (do symbol "-"
+                   e <- expr
+                   return (t - e))
            <|> return t
 
 term :: Parser Int
-term = do f <- factor
+term = do f <- term'
           do symbol "*"
              t <- term
              return (f * t)
            <|> return f
+
+-- exercise 7
+term' :: Parser Int
+term' = do f <- factor
+           do symbol "^"
+              t <- term'
+              return (f ^ t)
+            <|> return f
 
 factor :: Parser Int
 factor = do symbol "("
             e <- expr
             symbol ")"
             return e
-         <|> natural
+         <|> integer
 
 eval :: String -> Int
 eval xs = case (parse expr xs) of
             [(n, [])] -> n
             [(_, out)] -> error ("Unused input " ++ out)
             [] -> error "Invalid input"
+
+--exercise 5-6
+data Expr = Val Int | Add Expr Expr
+

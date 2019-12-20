@@ -38,11 +38,12 @@ calc xs = do display xs
              if elem c buttons then
                process c xs
              else
-               do beep
+               do beep xs
                   calc xs
 
-beep :: IO ()
-beep = putStr "\BEL"
+beep :: String -> IO ()
+-- beep = putStr "\BEL"
+beep xs = putStr xs
 
 process :: Char -> String -> IO ()
 process c xs | elem c "qQ\ESC"    = quit
@@ -61,7 +62,7 @@ delete xs = calc (init xs)
 eval' :: String -> IO ()
 eval' xs = case parse expr xs of
             [(n,[])] -> calc (show n)
-            _        -> do beep
+            [(n,ys)] -> do beep ys
                            calc xs
 
 clear :: IO ()
