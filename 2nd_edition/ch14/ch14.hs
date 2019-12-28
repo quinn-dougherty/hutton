@@ -13,7 +13,7 @@ instance (Monoid a, Monoid b) => Monoid (a, b) where
   (x,y) `mappend` (x', y') = (x `mappend` x', y `mappend` y')
 
 -- 2
-instance Monoid b => Monoid a -> b where
+instance Monoid b => Monoid (a -> b) where
   -- mempty :: a -> b
   mempty = \x -> mempty
 
@@ -43,27 +43,3 @@ instance Traversable Maybe where
   traverse _ Nothing = Nothing
   traverse g (Just x) = pure Just <*> g x
 
-
--- 4
-data Tree a = Leaf | Node (Tree a) a (Tree a)
-  deriving Show
-
-instance Foldable Tree where
-  -- foldMap :: Monoid b -> (a -> b) -> Tree a -> b
-  foldMap f Leaf = mempty
-  foldMap f (Node l x r) = foldMap f l `mappend` f x `mappend` foldMap f r
-
-instance Traversable Tree where
-  -- traverse :: Applicative f => (a -> f b) -> Tree a -> f (Tree b)
-  traverse g Leaf = pure Leaf
-  traverse g (Node l x r) = pure Node <*> traverse g l <*> g x <*> traverse g r
-
--- 5 - using foldMap define a generic version of `filter` on lists to be used w any foldable type
-filter :: (a -> Bool) -> [a] -> [a]
-filter _ [] = []
-filter f (x:xs) = if f x then x : (filter f xs) else x : (filter f xs)
-
--- foldMap :: Monoid b => (a -> b) -> t a -> b
--- this is currently wrong
-filterF :: Foldable t => (a -> Bool) -> t a -> [a]
-filterF f xs = foldMap f xs
